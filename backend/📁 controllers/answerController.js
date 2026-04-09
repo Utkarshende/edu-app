@@ -23,14 +23,16 @@ export const getAnswers = async (req, res) => {
       question: req.params.id,
     })
       .populate("user", "name")
-      .sort({ upvotes: -1 }); // 🔥 important line
+      .lean();
+
+    // 🔥 Manual sorting
+    answers.sort((a, b) => b.upvotes.length - a.upvotes.length);
 
     res.json(answers);
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
 };
-
 export const upvoteAnswer = async (req, res) => {
   try {
     const answer = await Answer.findById(req.params.id);
