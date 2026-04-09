@@ -30,3 +30,30 @@ export const getAnswers = async (req, res) => {
     res.status(500).json({ message: error.message });
   }
 };
+
+export const upvoteAnswer = async (req, res) => {
+  try {
+    const answer = await Answer.findById(req.params.id);
+
+    if (!answer) {
+      return res.status(404).json({ message: "Answer not found" });
+    }
+
+    // 🔥 Check if user already voted
+    if (answer.upvotes.includes(req.user)) {
+      return res.status(400).json({ message: "Already upvoted" });
+    }
+
+    // Add user to upvotes array
+    answer.upvotes.push(req.user);
+
+    await answer.save();
+
+    res.json({
+      message: "Upvoted successfully",
+      totalUpvotes: answer.upvotes.length,
+    });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
