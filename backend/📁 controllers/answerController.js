@@ -1,6 +1,5 @@
 import Answer from "../models/Answer.js";
 
-// Add Answer
 export const addAnswer = async (req, res) => {
   try {
     const { questionId, content } = req.body;
@@ -25,7 +24,6 @@ export const getAnswers = async (req, res) => {
       .populate("user", "name")
       .lean();
 
-    // 🔥 Manual sorting
     answers.sort((a, b) => b.upvotes.length - a.upvotes.length);
 
     res.json(answers);
@@ -41,12 +39,10 @@ export const upvoteAnswer = async (req, res) => {
       return res.status(404).json({ message: "Answer not found" });
     }
 
-    // 🔥 Check if user already voted
     if (answer.upvotes.includes(req.user)) {
       return res.status(400).json({ message: "Already upvoted" });
     }
 
-    // Add user to upvotes array
     answer.upvotes.push(req.user);
 
     await answer.save();
